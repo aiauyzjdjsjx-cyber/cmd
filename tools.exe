@@ -1,0 +1,43 @@
+import discord
+from discord.ext import commands
+
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+# TOOL 1: Ping
+@bot.command()
+async def ping(ctx):
+    await ctx.send(f"Pong 🏓 ! {round(bot.latency * 1000)}ms")
+
+# TOOL 2: Help custom
+@bot.command()
+async def tools(ctx):
+    embed = discord.Embed(
+        title="🛠️ Tools disponibles",
+        description="Voici les commandes du bot :",
+        color=0x00ffcc
+    )
+    embed.add_field(name="!ping", value="Affiche la latence du bot", inline=False)
+    embed.add_field(name="!userinfo", value="Infos sur l'utilisateur", inline=False)
+    await ctx.send(embed=embed)
+
+# TOOL 3: User info
+@bot.command()
+async def userinfo(ctx, member: discord.Member = None):
+    member = member or ctx.author
+    embed = discord.Embed(title="👤 User Info", color=0x3498db)
+    embed.add_field(name="Nom", value=member.name, inline=True)
+    embed.add_field(name="ID", value=member.id, inline=True)
+    embed.set_thumbnail(url=member.avatar.url if member.avatar else None)
+    await ctx.send(embed=embed)
+
+# TOOL 4: Clear messages
+@bot.command()
+@commands.has_permissions(manage_messages=True)
+async def clear(ctx, amount: int = 5):
+    await ctx.channel.purge(limit=amount)
+    await ctx.send(f"🧹 {amount} messages supprimés", delete_after=3)
+
+bot.run("YOUR_BOT_TOKEN")
